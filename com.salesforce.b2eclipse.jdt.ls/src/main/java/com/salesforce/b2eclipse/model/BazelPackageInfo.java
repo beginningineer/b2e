@@ -67,7 +67,6 @@ public class BazelPackageInfo {
     protected BazelPackageInfo workspaceRootNode;
 
     public static final String WORKSPACE_FILENAME = "WORKSPACE";
-    public static final String BUILD_FILENAME = "BUILD";
 
     private String computedPackageName = null;
     private String computedPackageNameLastSegment = null;

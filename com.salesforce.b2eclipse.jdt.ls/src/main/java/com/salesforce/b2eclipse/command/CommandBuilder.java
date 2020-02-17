@@ -103,25 +103,6 @@ public abstract class CommandBuilder {
         return this;
     }
 
-    /**
-     * Set an {@link OutputStream} to receive non selected lines from the standard output stream of the program in
-     * lieu of the console. If a selector has been set with {@link #setStdoutLineSelector(Function)}, only the lines
-     * not selected (for which the selector returns null) will be printed to the {@link OutputStream}.
-     */
-    public CommandBuilder setStandardOutput(OutputStream stdout) {
-        this.stdout = stdout;
-        return this;
-    }
-
-    /**
-     * Set an {@link OutputStream} to receive non selected lines from the standard error stream of the program in
-     * lieu of the console. If a selector has been set with {@link #setStderrLineSelector(Function)}, only the lines
-     * not selected (for which the selector returns null) will be printed to the {@link OutputStream}.
-     */
-    public CommandBuilder setStandardError(OutputStream stderr) {
-        this.stderr = stderr;
-        return this;
-    }
 
     /**
      * Add arguments to the command line. The first argument to be added to the builder is the program name.
@@ -178,13 +159,7 @@ public abstract class CommandBuilder {
         return this;
     }
 
-    /**
-     * Provide an optional timeout for the command (in milliseconds).
-     */
-    public CommandBuilder setTimeout(long timeoutMS) {
-        this.timeoutMS = timeoutMS;
-        return this;
-    }
+
 
     /**
      * Build a Command object.

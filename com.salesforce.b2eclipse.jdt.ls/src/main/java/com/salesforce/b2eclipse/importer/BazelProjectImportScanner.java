@@ -71,27 +71,7 @@ public class BazelProjectImportScanner {
     // TODO BazelProjectImportScanner should be moved into the plugin-command project, but will require some refactoring
     // of BazelProjectConfigurator and maybe other collaborators
     
-    /**
-     * Get a list of candidate Bazel packages to import. This list is provided to the user in the form of a tree
-     * control.
-     * <p>
-     * Currently, the list returned will always be of size 1. It represents the root node of the scanned Bazel
-     * workspace. The root node has child node references, and the tree expands from there.
-     * <p>
-     * TODO support scanning at an arbitrary location inside of a Bazel workspace (e.g. //projects/libs) and have the
-     * scanner crawl up to the WORKSPACE root from there.
-     * 
-     * @param rootDirectory
-     *            the directory to scan, which must be the root node of a Bazel workspace
-     * @return the workspace root BazelPackageInfo
-     */
-    public BazelPackageInfo getProjects(String rootDirectory) {
-        if (rootDirectory == null || rootDirectory.isEmpty()) {
-            // this is the initialization state of the wizard
-            return null;
-        }
-        return getProjects(new File(rootDirectory));
-    }
+
     
     /**
      * Get a list of candidate Bazel packages to import. This list is provided to the user in the form of a tree

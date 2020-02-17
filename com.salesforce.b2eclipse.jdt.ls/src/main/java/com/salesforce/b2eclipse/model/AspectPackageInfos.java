@@ -33,14 +33,7 @@
  */
 package com.salesforce.b2eclipse.model;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -52,13 +45,9 @@ import java.util.TreeMap;
  */
 public class AspectPackageInfos {
 
-    public static final AspectPackageInfos EMPTY = new AspectPackageInfos(Collections.emptyList());
 
     private final Map<String, AspectPackageInfo> labelToAspectPackageInfo = new TreeMap<>();
 
-    public AspectPackageInfos(AspectPackageInfo... aspectPackageInfos) {
-        this(Arrays.asList(aspectPackageInfos));
-    }
 
     public AspectPackageInfos(Collection<AspectPackageInfo> aspectPackageInfos) {
         for (AspectPackageInfo aspectPackageInfo : aspectPackageInfos) {
@@ -70,46 +59,7 @@ public class AspectPackageInfos {
         }
     }
 
-    public AspectPackageInfo lookupByLabel(String label) {
-        return labelToAspectPackageInfo.get(label);
-    }
 
-    public Collection<AspectPackageInfo> lookupByTargetKind(EnumSet<TargetKind> requestedTargetKinds) {
-        List<AspectPackageInfo> aspectPackageInfos = new ArrayList<>();
-        for (AspectPackageInfo aspectPackageInfo : labelToAspectPackageInfo.values()) {
-            if (requestedTargetKinds.contains(TargetKind.valueOfIgnoresCase(aspectPackageInfo.getKind()))) {
-                aspectPackageInfos.add(aspectPackageInfo);
-            }
-        }
-        return aspectPackageInfos;
-    }
-
-    /**
-     * Returns all AspectPackageInfo instances that have one or more matching root source path.
-     */
-    public Collection<AspectPackageInfo> lookupByRootSourcePath(String rootSourcePath) {
-        List<AspectPackageInfo> aspectPackageInfos = new ArrayList<>();
-        Path rootSourcePathP = Paths.get(rootSourcePath);
-        for (AspectPackageInfo aspectPackageInfo : labelToAspectPackageInfo.values()) {
-            for (String sourcePath : aspectPackageInfo.getSources()) {
-                if (Paths.get(sourcePath).startsWith(rootSourcePathP)) {
-                    assertAllSourcesHaveSameRootPath(rootSourcePathP, aspectPackageInfo);
-                    aspectPackageInfos.add(aspectPackageInfo);
-                    break;
-                }
-            }
-        }
-        return aspectPackageInfos;
-    }
-
-    private static void assertAllSourcesHaveSameRootPath(Path rootSourcePath, AspectPackageInfo aspectPackageInfo) {
-        for (String sourcePath : aspectPackageInfo.getSources()) {
-            if (!Paths.get(sourcePath).startsWith(rootSourcePath)) {
-                throw new IllegalStateException("AspectPackageInfo " + aspectPackageInfo.getLabel()
-                        + " has sources that are not under " + rootSourcePath + ": " + aspectPackageInfo.getSources());
-            }
-        }
-    }
 
     @Override
     public String toString() {

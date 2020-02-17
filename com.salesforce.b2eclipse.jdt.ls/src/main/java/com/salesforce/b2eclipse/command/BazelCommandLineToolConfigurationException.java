@@ -54,30 +54,4 @@ public class BazelCommandLineToolConfigurationException extends Exception {
         }
     }
 
-    public static final class BazelNotFoundException extends BazelCommandLineToolConfigurationException {
-        private static final long serialVersionUID = 1L;
-
-        public BazelNotFoundException(String path) {
-            super("Path to Bazel is wrong (" + path + " does not exist), please set it to a valid path"
-                    + "(Preferences... > Bazel Plugins Preferences)");
-        }
-    }
-
-    public static final class BazelNotExecutableException extends BazelCommandLineToolConfigurationException {
-        private static final long serialVersionUID = 1L;
-
-        public BazelNotExecutableException(String path) {
-            super("Path to Bazel is wrong (" + path + " does not point to a executable file), please set it "
-                    + "(Preferences... > Bazel Plugins Preferences)");
-        }
-    }
-
-    public static final class BazelTooOldException extends BazelCommandLineToolConfigurationException {
-        private static final long serialVersionUID = 1L;
-
-        public BazelTooOldException(String actualVersion, String wantedVersion, String path) {
-            super("Bazel version (" + actualVersion + ") of " + path + " is unsupported (want "+wantedVersion+" or higher), "
-                    + "please update your Bazel installation.");
-        }
-    }
 }

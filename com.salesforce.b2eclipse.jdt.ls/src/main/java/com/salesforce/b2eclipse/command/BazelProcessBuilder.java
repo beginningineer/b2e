@@ -50,33 +50,8 @@ public class BazelProcessBuilder {
         return this.innerProcessBuilder;
     }
     
-    /**
-     * Returns this process builder's operating system program and
-     * arguments.  The returned list is <i>not</i> a copy.  Subsequent
-     * updates to the list will be reflected in the state of this
-     * process builder.
-     *
-     * @return this process builder's program and its arguments
-     */
-    public List<String> command() {
-        return this.innerProcessBuilder.command();
-    }
+
     
-    /**
-     * Returns this process builder's working directory.
-     *
-     * Subprocesses subsequently started by this object's {@link
-     * #start()} method will use this as their working directory.
-     * The returned value may be {@code null} -- this means to use
-     * the working directory of the current Java process, usually the
-     * directory named by the system property {@code user.dir},
-     * as the working directory of the child process.
-     *
-     * @return this process builder's working directory
-     */
-    public File directory() {
-        return this.innerProcessBuilder.directory();
-    }
     
     /**
      * Sets this process builder's working directory.

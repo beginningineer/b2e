@@ -88,25 +88,5 @@ public interface WorkProgressMonitor {
      */
     public void worked(int work);
 
-    WorkProgressMonitor NOOP = new WorkProgressMonitor() {
-        @Override
-        public void worked(int work) {}
 
-        @Override
-        public void subTask(String name) {}
-
-        @Override
-        public void setCanceled(boolean value) {}
-
-        @Override
-        public boolean isCanceled() {
-            return false;
-        }
-
-        @Override
-        public void done() {}
-
-        @Override
-        public void beginTask(String name, int totalWork) {}
-    };
 }

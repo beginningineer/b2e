@@ -50,8 +50,6 @@ import com.salesforce.b2eclipse.BazelJdtPlugin;
 import com.salesforce.b2eclipse.abstractions.BazelAspectLocation;
 import com.salesforce.b2eclipse.abstractions.WorkProgressMonitor;
 import com.salesforce.b2eclipse.command.internal.BazelCommandExecutor;
-import com.salesforce.b2eclipse.command.internal.BazelQueryHelper;
-import com.salesforce.b2eclipse.command.internal.BazelVersionChecker;
 import com.salesforce.b2eclipse.command.internal.BazelWorkspaceAspectHelper;
 import com.salesforce.b2eclipse.model.AspectPackageInfo;
 import com.salesforce.b2eclipse.model.BazelMarkerDetails;
@@ -89,13 +87,7 @@ public class BazelWorkspaceCommandRunner {
      */
     private File bazelOutputBaseDirectory;
 
-    /**
-     * The internal location on disk for Bazel's 'bazel-bin' for this workspace. E.g.
-     * <i>/private/var/tmp/_bazel_plaird/f521799c9882dcc6330b57416b13ba81/execroot/bazel_eclipse_feature/bazel-out/darwin-fastbuild/bin</i>
-     * <p>
-     * Determined by running this command line: <i>bazel info bazel-bin</i>
-     */
-    private File bazelBinDirectory;
+
 
 
     // GLOBAL CONFIG
@@ -130,15 +122,11 @@ public class BazelWorkspaceCommandRunner {
      */
     private final BazelWorkspaceAspectHelper aspectHelper;
 
-    /**
-     * Helper for running bazel query commands.
-     */
-    private final BazelQueryHelper bazelQueryHelper;
+
 
     /**
      * Helper for running version checks of the configured Bazel executable.
      */
-    private final BazelVersionChecker bazelVersionChecker;
 
     /**
      * These arguments are added to all "bazel build" commands that run for the purpose of building code. These may be
@@ -157,12 +145,10 @@ public class BazelWorkspaceCommandRunner {
 
         this.commandBuilder = commandBuilder;
         this.bazelCommandExecutor = new BazelCommandExecutor(bazelExecutable, commandBuilder);
-        this.bazelVersionChecker = new BazelVersionChecker(this.commandBuilder);
 
         // these operations are not available without a workspace, and are nulled out
         this.bazelWorkspaceRootDirectory = null;
         this.aspectHelper = null;
-        this.bazelQueryHelper = null;
     }
 
     /**
@@ -179,8 +165,6 @@ public class BazelWorkspaceCommandRunner {
         this.bazelCommandExecutor = new BazelCommandExecutor(bazelExecutable, commandBuilder);
 
         this.aspectHelper = new BazelWorkspaceAspectHelper(this, aspectLocation, this.bazelCommandExecutor);
-        this.bazelVersionChecker = new BazelVersionChecker(this.commandBuilder);
-        this.bazelQueryHelper = new BazelQueryHelper(bazelCommandExecutor);
     }
 
 
@@ -241,28 +225,6 @@ public class BazelWorkspaceCommandRunner {
         return bazelOutputBaseDirectory;
     }
 
-    /**
-     * Returns the bazel-bin of the current Bazel workspace.
-     *
-     * @param progressMonitor
-     *            can be null
-     */
-    public File getBazelWorkspaceBin(WorkProgressMonitor progressMonitor) {
-        if (bazelBinDirectory == null) {
-            try {
-                ImmutableList.Builder<String> argBuilder = ImmutableList.builder();
-                argBuilder.add("info").add("bazel-bin");
-
-                List<String> outputLines = bazelCommandExecutor.runBazelAndGetOutputLines(bazelWorkspaceRootDirectory, progressMonitor,
-                    argBuilder.build(), (t) -> t);
-                outputLines = BazelCommandExecutor.stripInfoLines(outputLines);
-                bazelBinDirectory = new File(String.join("", outputLines));
-            } catch (Exception anyE) {
-                throw new IllegalStateException(anyE);
-            }
-        }
-        return bazelBinDirectory;
-    }
 
     /**
      * These arguments are added to all "bazel build" commands that run for the purpose of building code.
@@ -300,35 +262,6 @@ public class BazelWorkspaceCommandRunner {
 
     // BUILD, BUILD INFO, RUN, TEST OPERATIONS
 
-    /**
-     * Returns the list of targets found in the BUILD files for the given sub-directories. Uses Bazel Query to build the
-     * list.
-     *
-     * @param progressMonitor
-     *            can be null
-     * @throws BazelCommandLineToolConfigurationException
-     */
-    public synchronized List<String> listBazelTargetsInBuildFiles(WorkProgressMonitor progressMonitor,
-            File... directories) throws IOException, InterruptedException, BazelCommandLineToolConfigurationException {
-        return this.bazelQueryHelper.listBazelTargetsInBuildFiles(bazelWorkspaceRootDirectory, progressMonitor, directories);
-    }
-
-    /**
-     * Gives a list of target completions for the given beginning string. The result is the list of possible completion
-     * for a target pattern starting with string.
-     * <p>
-     * <b>WARNING:</b> this method was written for the original Bazel plugin for a search feature, but was not actually
-     * used as far as we can tell. It may or may not work as advertised.
-     *
-     * @param userSearchString
-     *            the partial target string entered by the user
-     *
-     * @throws BazelCommandLineToolConfigurationException
-     */
-    public List<String> getMatchingTargets(String userSearchString, WorkProgressMonitor progressMonitor)
-            throws IOException, InterruptedException, BazelCommandLineToolConfigurationException {
-        return this.bazelQueryHelper.getMatchingTargets(this.bazelWorkspaceRootDirectory, userSearchString, progressMonitor);
-    }
 
     /**
      * Run a bazel build on a list of targets in the current workspace.
@@ -412,16 +345,6 @@ public class BazelWorkspaceCommandRunner {
         return this.commandBuilder;
     }
 
-    /**
-     * Returns a builder for issuing custom launcher commands (e.g. 'bazel run', 'bazel test'). The builder
-     * comes pre-wired into other collaborators.
-     */
-    public BazelLauncherBuilder getBazelLauncherBuilder() {
-        BazelLauncherBuilder launcherBuilder = new BazelLauncherBuilder(this, this.commandBuilder);
-
-        return launcherBuilder;
-    }
-
 
     // SPECIAL OPERATIONS
 
@@ -439,15 +362,6 @@ public class BazelWorkspaceCommandRunner {
         } catch (IOException | InterruptedException | BazelCommandLineToolConfigurationException e) {
             e.printStackTrace();
         }
-    }
-
-    /**
-     * Checks the version of the bazel binary configured at the path specified in the Preferences.
-     *
-     * @throws BazelCommandLineToolConfigurationException
-     */
-    public void runBazelVersionCheck() throws BazelCommandLineToolConfigurationException {
-        bazelVersionChecker.runBazelVersionCheck(bazelExecutable, this.bazelWorkspaceRootDirectory);
     }
 
 

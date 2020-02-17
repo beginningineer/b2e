@@ -78,8 +78,6 @@ public class BazelBuilder extends IncrementalProjectBuilder {
 
     public static final String BUILDER_NAME = "com.salesforce.b2eclipse.builder";
 
-    private final BazelMarkerManagerSingleton markerManager = BazelMarkerManagerSingleton.getInstance();
-
     @Override
     protected IProject[] build(int kind, Map<String, String> args, IProgressMonitor monitor) throws CoreException {
         WorkProgressMonitor progressMonitor = new EclipseWorkProgressMonitor(monitor);

@@ -36,21 +36,13 @@
 package com.salesforce.b2eclipse;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 
-import org.eclipse.core.resources.IWorkspace;
-import org.eclipse.core.resources.IWorkspaceDescription;
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
-import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.BundleException;
 
-import com.google.common.base.Throwables;
 import com.salesforce.b2eclipse.abstractions.BazelAspectLocation;
 import com.salesforce.b2eclipse.command.BazelCommandManager;
 import com.salesforce.b2eclipse.command.BazelWorkspaceCommandRunner;
@@ -70,9 +62,6 @@ public class BazelJdtPlugin extends Plugin {
 	
     // The plug-in ID
     public static final String PLUGIN_ID = "com.salesforce.b2eclipse.jdt.ls"; //$NON-NLS-1$
-
-    // The preference key for the bazel workspace root path
-    public static final String BAZEL_WORKSPACE_PATH_PREF_NAME = "bazel.workspace.root";
 
     // GLOBAL COLLABORATORS
     // TODO move the collaborators to some other place, perhaps a dedicated static context object
@@ -165,18 +154,6 @@ public class BazelJdtPlugin extends Plugin {
         return bazelWorkspaceRootDirectory;
     }
 
-    /**
-     * Returns the location on disk where the Bazel workspace is located. There must be a WORKSPACE file
-     * in this location. Prior to importing/opening a Bazel workspace, this location will be null
-     */
-    public static String getBazelWorkspaceRootDirectoryPath() {
-        if (bazelWorkspaceRootDirectory == null) {
-            new Throwable().printStackTrace();
-            BazelJdtPlugin.logError("BazelPluginActivator was asked for the Bazel workspace root directory before it is determined.");
-            return null;
-        }
-        return bazelWorkspaceRootDirectory.getAbsolutePath();
-    }
 
     /**
      * Sets the location on disk where the Bazel workspace is located. There must be a WORKSPACE file
@@ -203,17 +180,7 @@ public class BazelJdtPlugin extends Plugin {
         return bazelCommandManager;
     }
 
-    /**
-     * Once the workspace is set, the workspace command runner is available. Otherwise returns null
-     */
-	public static BazelWorkspaceCommandRunner getWorkspaceCommandRunner() {
-        if (bazelWorkspaceCommandRunner == null) {
-            if (bazelWorkspaceRootDirectory != null) {
-                bazelWorkspaceCommandRunner = bazelCommandManager.getWorkspaceCommandRunner(bazelWorkspaceRootDirectory);
-            }
-        }
-        return bazelWorkspaceCommandRunner;
-    }
+
 
     /**
      * Returns the unique instance of {@link ResourceHelper}, this helper helps retrieve workspace and project
@@ -237,9 +204,6 @@ public class BazelJdtPlugin extends Plugin {
 		}
 	}
 
-	public static void log(CoreException e) {
-		log(e.getStatus());
-	}
 
 	public static void logError(String message) {
 		if (context != null) {
@@ -253,15 +217,7 @@ public class BazelJdtPlugin extends Plugin {
 		}
 	}
 
-	public static void logException(Throwable ex) {
-		if (context != null) {
-			String message = ex.getMessage();
-			if (message == null) {
-				message = Throwables.getStackTraceAsString(ex);
-			}
-			logException(message, ex);
-		}
-	}
+
 
 	public static void logException(String message, Throwable ex) {
 		if (context != null) {

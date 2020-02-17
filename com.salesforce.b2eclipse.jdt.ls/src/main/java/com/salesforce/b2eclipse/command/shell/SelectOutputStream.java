@@ -122,10 +122,5 @@ public class SelectOutputStream extends OutputStream {
         return ImmutableList.copyOf(lines);
     }
 
-    /**
-     * Returns the list of output lines.
-     */
-    ImmutableList<String> getOutputLines() {
-        return ImmutableList.copyOf(outputLines);
-    }
+
 }

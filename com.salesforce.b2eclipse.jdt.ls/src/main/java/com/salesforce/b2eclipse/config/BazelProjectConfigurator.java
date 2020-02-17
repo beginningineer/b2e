@@ -35,24 +35,15 @@ package com.salesforce.b2eclipse.config;
 
 import java.io.File;
 import java.io.InputStream;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-//import org.eclipse.buildship.core.ProjectConfigurator;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IFolder;
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 
 import com.salesforce.b2eclipse.BazelJdtPlugin;
-import com.salesforce.b2eclipse.BazelNature;
 import com.salesforce.b2eclipse.model.BazelBuildFileHelper;
 
 // copied from m2e MavenProjectConfigurator
@@ -121,121 +112,5 @@ public class BazelProjectConfigurator {
         return false;
     }
 
-    /**
-     * Tells whether this configurator thinks that a given {@link IContainer} should be also imported as a project into
-     * the workspace.
-     *
-     * <p>
-     * This method must be stateless (ideally static) and cannot rely on any class state.
-     * </p>
-     *
-     * @param container
-     *            the container to analyze
-     * @param monitor
-     *            the progress monitor
-     * @return true if the given folder is for sure to be considered as a project
-     */
-    public boolean shouldBeAnEclipseProject(IContainer container, IProgressMonitor monitor) {
-        IFile buildFile = container.getFile(new Path("BUILD"));
-        if (!buildFile.exists()) {
-            return false;
-        }
-
-        boolean hasJavaRule = false;
-        try (InputStream is = buildFile.getContents()) {
-            hasJavaRule = BazelBuildFileHelper.hasJavaRules(is);
-        } catch (Exception anyE) {
-			BazelJdtPlugin.logException(anyE.getMessage(), anyE);
-        }
-
-        return hasJavaRule;
-    }
-
-    /**
-     * Checks whether this configurator can contribute to the configuration of the given project.
-     *
-     * <p>
-     * This method must be stateless.
-     * </p>
-     *
-     * @param project
-     *            the project to check for potential configuration
-     * @param ignoredPaths
-     *            paths that have to be ignored when checking whether this configurator applies. Those will typically be
-     *            nested projects (handled separately), or output directories (bin/, target/, ...).
-     * @param monitor
-     *            the progress monitor
-     * @return <code>true</code> iff this configurator can configure the given project
-     */
-    public boolean canConfigure(IProject project, Set<IPath> ignoredPaths, IProgressMonitor monitor) {
-        return shouldBeAnEclipseProject(project, monitor);
-    }
-
-    /**
-     * Configures a project. This method will only be called if {@link #canConfigure(IProject, Set, IProgressMonitor)}
-     * returned <code>true</code> for the given project.
-     *
-     * <p>
-     * This method must be stateless.
-     * </p>
-     *
-     * @param project
-     *            the project to configure
-     * @param ignoredPaths
-     *            paths that have to be ignored when configuring the project. Those will typically be nested projects,
-     *            output directories (bin/, target/, ...)
-     * @param monitor
-     *            the progress monitor
-     */
-    public void configure(IProject project, Set<IPath> ignoredPaths, IProgressMonitor monitor) {
-        try {
-            // TODO when will this be called? we add the nature already when we created the project
-            BazelEclipseProjectFactory.addNatureToEclipseProject(project, BazelNature.BAZEL_NATURE_ID);
-        } catch (CoreException coreEx) {
-			BazelJdtPlugin.logError("Exception adding Bazel nature: " + coreEx.getMessage());
-        }
-    }
-
-    // IGNORE DIRECTORIES
-
-    /**
-     * Returns the folders to exclude from the analysis that happens on an {@link IProject}.
-     *
-     * <p>
-     * This method must be stateless.
-     * </p>
-     *
-     * @param project
-     *            the project to check for content to ignore
-     * @param monitor
-     *            the progress monitor
-     * @return the set of child folders to ignore in import operation. Typically output directories such as bin/ or
-     *         target/.
-     */
-    public Set<IFolder> getFoldersToIgnore(IProject project, IProgressMonitor monitor) {
-        Set<IFolder> res = new HashSet<>();
-
-        // do we want to exclude any folders in a package from scanning for BUILD files? Not so far.
-
-        return res;
-    }
-
-    /**
-     * Removes from the set of directories those that should not be proposed to the user for import. Those are typically
-     * dirty volatile directories such as build output directories.
-     *
-     * <p>
-     * This method must be stateless.
-     * </p>
-     *
-     * @param proposals
-     *            the existing import proposals (key is file and value is the list of configurators that have identified
-     *            the key as a location they can configure for import). Those can be modified and current method is
-     *            expected to remove some entries from this map.
-     */
-//    public void removeDirtyDirectories(Map<File, List<ProjectConfigurator>> proposals) {
-//        // this is not an issue with Bazel
-//        // there are output directories in the top level workspace root, but they will not have BUILD files in them
-//    }
 
 }

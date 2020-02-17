@@ -73,19 +73,6 @@ public class BazelCommandExecutor {
     }
 
 
-    public synchronized List<String> runBazelAndGetOuputLines(ConsoleType consoleType, File workingDirectory,
-            WorkProgressMonitor progressMonitor, List<String> args, Function<String, String> selector)
-            throws IOException, InterruptedException, BazelCommandLineToolConfigurationException {
-        
-        CommandBuilder builder = getConfiguredCommandBuilder(consoleType, workingDirectory, progressMonitor, args);
-        Command command = builder.setStdoutLineSelector(selector).build();
-
-        if (command.run() == 0) {
-            return command.getSelectedOutputLines();
-        }
-        return ImmutableList.of();
-    }
-
     // WHEN INTERESTING OUTPUT IS ON STDERR...
     
     public synchronized List<String> runBazelAndGetErrorLines(File directory, WorkProgressMonitor progressMonitor,
